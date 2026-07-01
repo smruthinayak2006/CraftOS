@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import CreateProjectModal from "@/components/CreateProjectModal";
 
@@ -31,7 +32,6 @@ export default function Home() {
     const updatedProjects = [newProject, ...projects];
 
     setProjects(updatedProjects);
-
     localStorage.setItem("projects", JSON.stringify(updatedProjects));
   }
 
@@ -73,18 +73,20 @@ export default function Home() {
           ) : (
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {projects.map((project) => (
-                <div
+                <Link
                   key={project.id}
-                  className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6"
+                  href={`/project/${project.id}`}
                 >
-                  <h3 className="text-xl font-semibold">
-                    {project.name}
-                  </h3>
+                  <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 transition hover:border-white hover:scale-[1.02] cursor-pointer">
+                    <h3 className="text-xl font-semibold">
+                      {project.name}
+                    </h3>
 
-                  <p className="mt-2 text-sm text-zinc-400">
-                    {project.description || "No description"}
-                  </p>
-                </div>
+                    <p className="mt-2 text-sm text-zinc-400">
+                      {project.description || "No description"}
+                    </p>
+                  </div>
+                </Link>
               ))}
             </div>
           )}
