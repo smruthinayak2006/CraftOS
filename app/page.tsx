@@ -1,8 +1,11 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CreateProjectModal from "@/components/CreateProjectModal";
+import { getProjects, createProject } from "@/app/lib/api";
 
 type Project = {
   id: string;
@@ -15,24 +18,21 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    const savedProjects = localStorage.getItem("projects");
-
-    if (savedProjects) {
-      setProjects(JSON.parse(savedProjects));
+    async function loadProjects() {
+      const data = await getProjects();
+      setProjects(data);
     }
+
+    loadProjects();
   }, []);
 
-  function handleCreateProject(name: string, description: string) {
-    const newProject: Project = {
-      id: crypto.randomUUID(),
-      name,
-      description,
-    };
+  async function handleCreateProject(
+    name: string,
+    description: string
+  ) {
+    const newProject = await createProject(name, description);
 
-    const updatedProjects = [newProject, ...projects];
-
-    setProjects(updatedProjects);
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
+    setProjects((previous) => [newProject, ...previous]);
   }
 
   return (
