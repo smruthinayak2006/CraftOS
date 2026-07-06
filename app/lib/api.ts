@@ -24,9 +24,11 @@ export async function createProject(
 }
 
 export async function getProject(id: string) {
-  const response = await fetch(`${API_URL}/projects`);
+  const response = await fetch(`${API_URL}/projects/${id}`);
 
-  const projects = await response.json();
+  if (!response.ok) {
+    return null;
+  }
 
-  return projects.find((project: any) => project.id === id);
+  return response.json();
 }

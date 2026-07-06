@@ -1,6 +1,6 @@
 from uuid import uuid4
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI(
@@ -39,6 +39,17 @@ def root():
 @app.get("/projects")
 def get_projects():
     return projects
+
+@app.get("/projects/{project_id}")
+def get_project(project_id: str):
+    for project in projects:
+        if project["id"] == project_id:
+            return project
+
+    raise HTTPException(
+        status_code=404,
+        detail="Project not found",
+    )
 
 
 @app.post("/projects")
