@@ -113,37 +113,59 @@ CraftOS/
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
 ### Dashboard
-
-`docs/screenshots/frontend-dashboard.png`
-
-### Project Workspace
-
-`docs/screenshots/project-workspace.png`
-
-### Create Project API
-
-`docs/screenshots/create-project-api-success.png`
-
-### Get Projects API
-
-`docs/screenshots/get-projects-api-success.png`
-
-### Get Project by ID
-
-`docs/screenshots/get-project-by-id-success.png`
-
-### Upload README
-
-`docs/screenshots/readme-upload-success.png`
-
-### Download README
-
-`docs/screenshots/readme-download-success.png`
+![Dashboard](docs/screenshots/frontend-dashboard.png)
 
 ---
+
+### Project Workspace
+![Project Workspace](docs/screenshots/project-workspace.png)
+
+---
+
+### Create Project API
+![Create Project API](docs/screenshots/create-project-api-success.png)
+
+---
+
+### Get All Projects API
+![Get Projects API](docs/screenshots/get-projects-api-success.png)
+
+---
+
+### Get Project by ID
+![Get Project by ID](docs/screenshots/get-project-by-id-success.png)
+
+---
+
+### Upload README
+![Upload README](docs/screenshots/readme-upload-success.png)
+
+---
+
+### Download README
+![Download README](docs/screenshots/readme-download-success.png)
+
+---
+
+
+## 🚀 Current Features
+
+- ✅ Create new projects
+- ✅ View all projects
+- ✅ View project details
+- ✅ REST API with FastAPI
+- ✅ Interactive Swagger API documentation
+- ✅ Upload project README files
+- ✅ Download uploaded README files
+- 🚧 Screenshot management (coming soon)
+- 🚧 Notes management (coming soon)
+- 🚧 AI content generation (coming soon)
+
+---
+
 
 ## Running the Project
 
