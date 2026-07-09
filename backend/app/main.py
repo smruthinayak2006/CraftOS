@@ -12,7 +12,6 @@ app = FastAPI(
     version="0.1.0"
 )
 
-
 README_UPLOAD_DIR = Path("uploads/readmes")
 README_UPLOAD_DIR.mkdir(
     parents=True,
@@ -56,6 +55,7 @@ def root():
 def get_projects():
     return projects
 
+
 @app.get("/projects/{project_id}")
 def get_project(project_id: str):
     for project in projects:
@@ -66,6 +66,21 @@ def get_project(project_id: str):
         status_code=404,
         detail="Project not found",
     )
+
+
+@app.post("/projects")
+def create_project(project: ProjectCreate):
+    new_project = {
+        "id": str(uuid4()),
+        "name": project.name,
+        "description": project.description,
+        "readme": None,
+        "screenshots": [],
+    }
+
+    projects.append(new_project)
+
+    return new_project
 
 
 @app.post("/projects/{project_id}/readme")
@@ -111,7 +126,7 @@ def get_readme(project_id: str):
             detail="Project not found"
         )
 
-    if "readme" not in project:
+    if not project["readme"]:
         raise HTTPException(
             status_code=404,
             detail="README not uploaded"
@@ -124,16 +139,67 @@ def get_readme(project_id: str):
     )
 
 
-@app.post("/projects")
-def create_project(project: ProjectCreate):
-    new_project = {
-        "id": str(uuid4()),
-        "name": project.name,
-        "description": project.description,
-        "readme": None,
-        "screenshots": [],
+@app.post("/projects/{project_id}/screenshots")
+def upload_screenshot(
+    project_id: str,
+    file: UploadFile = File(...)
+):
+    project = next(
+        (p for p in projects if p["id"] == project_id),
+        None
+    )
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    extension = Path(file.filename).suffix
+
+    filename = f"{uuid4()}{extension}"
+
+    file_path = SCREENSHOT_UPLOAD_DIR / filename
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    project["screenshots"].append(filename)
+
+    return {
+        "message": "Screenshot uploaded successfully",
+        "filename": filename,
     }
 
-    projects.append(new_project)
 
-    return new_project
+@app.get("/projects/{project_id}/screenshots")
+def get_screenshots(project_id: str):
+
+    project = next(
+        (p for p in projects if p["id"] == project_id),
+        None
+    )
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    return {
+        "screenshots": project["screenshots"]
+    }
+
+
+@app.get("/screenshots/{filename}")
+def get_screenshot(filename: str):
+
+    file_path = SCREENSHOT_UPLOAD_DIR / filename
+
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Screenshot not found"
+        )
+
+    return FileResponse(file_path)

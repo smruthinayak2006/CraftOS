@@ -32,3 +32,7 @@ export async function getProject(id: string) {
 
   return response.json();
 }
+
+export function getScreenshotUrl(filename: string) {
+  return `${API_URL}/screenshots/${filename}`;
+}
