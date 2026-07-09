@@ -58,3 +58,11 @@ backend/*.db
 
 .DS_Store
 *.pem
+
+# Uploaded runtime files
+backend/uploads/readmes/*
+backend/uploads/screenshots/*
+
+# Keep folders in Git
+!backend/uploads/readmes/.gitkeep
+!backend/uploads/screenshots/.gitkeep

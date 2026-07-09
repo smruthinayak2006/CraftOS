@@ -1,94 +1,57 @@
 # CraftOS
 
-> AI-powered developer workspace for managing software projects, documentation, screenshots, and AI-generated content.
+AI-powered Content Operating System for developers, students, and creators.
 
-## Overview
-
-CraftOS is a full-stack project management platform designed for developers. It provides a centralized workspace where users can create projects, organize documentation, upload README files, manage screenshots, and prepare AI-generated project content.
-
-The current version focuses on building the backend API and frontend integration using FastAPI and Next.js.
+CraftOS helps organize software projects by storing project details, README files, screenshots, notes, and AI-generated content in one workspace.
 
 ---
 
-## Features
+# Features
 
-### Project Management
-
-- Create new projects
+- Create projects
 - View all projects
-- View individual project details
-- Unique UUID generated for every project
-
-### README Management
-
+- View individual project workspace
 - Upload README files
-- Download uploaded README files
-- Store uploaded README files on the server
-- Validate missing README requests
-
-### REST API
-
-- FastAPI backend
-- Automatic Swagger documentation
-- OpenAPI schema generation
-- JSON responses
-- HTTP error handling
-
-### Frontend
-
-- Modern Next.js interface
-- Dark developer-focused UI
-- Dashboard showing recent projects
-- Project workspace page
-- Backend API integration
+- Download README files
+- REST API with FastAPI
+- Next.js frontend
+- Interactive Swagger documentation
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-### Frontend
+## Frontend
 
-- Next.js 15
+- Next.js
 - React
 - TypeScript
 - Tailwind CSS
 
-### Backend
+## Backend
 
 - FastAPI
 - Python
-- Pydantic
 - Uvicorn
-
-### Development
-
-- Git
-- GitHub
-- VS Code
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```
-CraftOS/
+CraftOS
 │
 ├── app/
 │   ├── lib/
-│   ├── project/
-│   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
+│   └── project/
 │
 ├── backend/
 │   ├── app/
 │   │   └── main.py
 │   │
-│   ├── uploads/
-│   │   └── readmes/
-│   │
-│   ├── requirements.txt
-│   └── venv/
+│   └── uploads/
+│       ├── readmes/
+│       └── screenshots/
 │
 ├── components/
 │
@@ -100,105 +63,86 @@ CraftOS/
 
 ---
 
-## Current API Endpoints
+# API Endpoints
 
 | Method | Endpoint | Description |
-|----------|----------|-------------|
-| GET | `/` | API Status |
-| GET | `/projects` | List all projects |
-| POST | `/projects` | Create project |
-| GET | `/projects/{project_id}` | Get project details |
-| POST | `/projects/{project_id}/readme` | Upload README |
-| GET | `/projects/{project_id}/readme` | Download README |
+|---------|----------|-------------|
+| GET | / | API Status |
+| GET | /projects | Get all projects |
+| POST | /projects | Create project |
+| GET | /projects/{project_id} | Get project |
+| POST | /projects/{project_id}/readme | Upload README |
+| GET | /projects/{project_id}/readme | Download README |
 
 ---
 
-## 📸 Screenshots
+# Current Features
 
-### Dashboard
+## Dashboard
+
 ![Dashboard](docs/screenshots/frontend-dashboard.png)
 
 ---
 
-### Project Workspace
-![Project Workspace](docs/screenshots/project-workspace.png)
+## Project Workspace
+
+![Workspace](docs/screenshots/project-workspace.png)
 
 ---
 
-### Create Project API
-![Create Project API](docs/screenshots/create-project-api-success.png)
+## Create Project API
+
+![Create Project](docs/screenshots/create-project-api-success.png)
 
 ---
 
-### Get All Projects API
-![Get Projects API](docs/screenshots/get-projects-api-success.png)
+## Get Projects API
+
+![Projects API](docs/screenshots/get-projects-api-success.png)
 
 ---
 
-### Get Project by ID
-![Get Project by ID](docs/screenshots/get-project-by-id-success.png)
+## Get Project by ID
+
+![Project By ID](docs/screenshots/get-project-by-id-success.png)
 
 ---
 
-### Upload README
+## Upload README
+
 ![Upload README](docs/screenshots/readme-upload-success.png)
 
 ---
 
-### Download README
+## Download README
+
 ![Download README](docs/screenshots/readme-download-success.png)
 
 ---
 
+## README Storage
 
-## 🚀 Current Features
-
-- ✅ Create new projects
-- ✅ View all projects
-- ✅ View project details
-- ✅ REST API with FastAPI
-- ✅ Interactive Swagger API documentation
-- ✅ Upload project README files
-- ✅ Download uploaded README files
-- 🚧 Screenshot management (coming soon)
-- 🚧 Notes management (coming soon)
-- 🚧 AI content generation (coming soon)
+![README Storage](docs/screenshots/readme-storage-backend.png)
 
 ---
 
-
-## Running the Project
-
-### Clone Repository
-
-```bash
-git clone <repository-url>
-cd CraftOS
-```
-
----
-
-### Backend
+# Running the Backend
 
 ```bash
 cd backend
 
-python -m venv venv
-
-venv\Scripts\activate
-
-pip install -r requirements.txt
+.\venv\Scripts\activate
 
 uvicorn app.main:app --reload
 ```
 
-Backend URL
+Backend:
 
 ```
 http://127.0.0.1:8000
 ```
 
-Swagger UI
+Swagger:
 
 ```
 http://127.0.0.1:8000/docs
@@ -206,9 +150,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-### Frontend
-
-Open another terminal.
+# Running the Frontend
 
 ```bash
 npm install
@@ -216,7 +158,7 @@ npm install
 npm run dev
 ```
 
-Frontend
+Frontend:
 
 ```
 http://localhost:3000
@@ -224,80 +166,17 @@ http://localhost:3000
 
 ---
 
-## Current Workflow
+# Roadmap
 
-```
-Create Project
-        │
-        ▼
-Project stored in backend
-        │
-        ▼
-Open Project Workspace
-        │
-        ▼
-Upload README
-        │
-        ▼
-README stored in uploads/readmes/
-        │
-        ▼
-Download README
-```
+- ✅ Project Management
+- ✅ README Management
+- ⏳ Screenshot Management
+- ⏳ Notes
+- ⏳ AI Content Generation
+- ⏳ Project Export
 
 ---
 
-## Current Limitations
-
-- Projects are stored in memory.
-- Data is lost when the backend restarts.
-- Screenshot upload UI is not implemented yet.
-- AI content generation is under development.
-- Authentication is not implemented.
-
----
-
-## Planned Features
-
-- SQLite database
-- Screenshot upload
-- Notes editor
-- AI README generation
-- AI documentation assistant
-- AI project summaries
-- Project search
-- User authentication
-- Dashboard analytics
-
----
-
-## Development Progress
-
-### Completed
-
-- Project initialization
-- FastAPI backend
-- Next.js frontend
-- Project creation
-- Project listing
-- Project details
-- README upload
-- README download
-- Swagger documentation
-
-### In Progress
-
-- Persistent database
-- Screenshot management
-
----
-
-## Author
+# Author
 
 Smruthi Nayak
-
-B.Tech Computer Science Engineering
-
-Internship Project
-
-2026

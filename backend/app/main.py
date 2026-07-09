@@ -13,9 +13,17 @@ app = FastAPI(
 )
 
 
-UPLOAD_DIR = Path("uploads/readmes")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+README_UPLOAD_DIR = Path("uploads/readmes")
+README_UPLOAD_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
 
+SCREENSHOT_UPLOAD_DIR = Path("uploads/screenshots")
+SCREENSHOT_UPLOAD_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -76,7 +84,7 @@ def upload_readme(
             detail="Project not found",
         )
 
-    file_path = UPLOAD_DIR / f"{project_id}.md"
+    file_path = README_UPLOAD_DIR / f"{project_id}.md"
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
