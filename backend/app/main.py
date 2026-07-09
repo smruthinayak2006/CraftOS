@@ -130,6 +130,8 @@ def create_project(project: ProjectCreate):
         "id": str(uuid4()),
         "name": project.name,
         "description": project.description,
+        "readme": None,
+        "screenshots": [],
     }
 
     projects.append(new_project)
