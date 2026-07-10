@@ -1,4 +1,3 @@
-from uuid import uuid4
 from pathlib import Path
 import shutil
 
@@ -7,10 +6,15 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from app.database import initialize_database
+import app.crud as crud
+
 app = FastAPI(
     title="CraftOS API",
     version="0.1.0"
 )
+
+initialize_database()
 
 README_UPLOAD_DIR = Path("uploads/readmes")
 README_UPLOAD_DIR.mkdir(
@@ -53,34 +57,29 @@ def root():
 
 @app.get("/projects")
 def get_projects():
-    return projects
+    return crud.get_projects()
 
 
 @app.get("/projects/{project_id}")
 def get_project(project_id: str):
-    for project in projects:
-        if project["id"] == project_id:
-            return project
 
-    raise HTTPException(
-        status_code=404,
-        detail="Project not found",
-    )
+    project = crud.get_project(project_id)
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found",
+        )
+
+    return project
 
 
 @app.post("/projects")
 def create_project(project: ProjectCreate):
-    new_project = {
-        "id": str(uuid4()),
-        "name": project.name,
-        "description": project.description,
-        "readme": None,
-        "screenshots": [],
-    }
-
-    projects.append(new_project)
-
-    return new_project
+    return crud.create_project(
+        project.name,
+        project.description,
+    )
 
 
 @app.post("/projects/{project_id}/readme")
@@ -126,7 +125,7 @@ def get_readme(project_id: str):
             detail="Project not found"
         )
 
-    if not project["readme"]:
+    if not project.get("readme"):
         raise HTTPException(
             status_code=404,
             detail="README not uploaded"
@@ -144,6 +143,7 @@ def upload_screenshot(
     project_id: str,
     file: UploadFile = File(...)
 ):
+
     project = next(
         (p for p in projects if p["id"] == project_id),
         None
@@ -157,11 +157,11 @@ def upload_screenshot(
 
     extension = Path(file.filename).suffix
 
-    filename = f"{uuid4()}{extension}"
+    filename = f"{Path(file.filename).stem}{extension}"
 
-    file_path = SCREENSHOT_UPLOAD_DIR / filename
+    destination = SCREENSHOT_UPLOAD_DIR / filename
 
-    with open(file_path, "wb") as buffer:
+    with open(destination, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     project["screenshots"].append(filename)
@@ -194,12 +194,47 @@ def get_screenshots(project_id: str):
 @app.get("/screenshots/{filename}")
 def get_screenshot(filename: str):
 
-    file_path = SCREENSHOT_UPLOAD_DIR / filename
+    image_path = SCREENSHOT_UPLOAD_DIR / filename
 
-    if not file_path.exists():
+    if not image_path.exists():
         raise HTTPException(
             status_code=404,
             detail="Screenshot not found"
         )
 
-    return FileResponse(file_path)
+    return FileResponse(image_path)
+
+
+@app.delete("/projects/{project_id}")
+def delete_project(project_id: str):
+
+    project = next(
+        (p for p in projects if p["id"] == project_id),
+        None
+    )
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    if project.get("readme"):
+
+        readme_path = Path(project["readme"])
+
+        if readme_path.exists():
+            readme_path.unlink()
+
+    for screenshot in project["screenshots"]:
+
+        image_path = SCREENSHOT_UPLOAD_DIR / screenshot
+
+        if image_path.exists():
+            image_path.unlink()
+
+    projects.remove(project)
+
+    return {
+        "message": "Project deleted successfully"
+    }
