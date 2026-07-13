@@ -11,7 +11,7 @@ import app.crud as crud
 
 app = FastAPI(
     title="CraftOS API",
-    version="0.1.0"
+    version="0.1.0",
 )
 
 initialize_database()
@@ -45,9 +45,6 @@ class ProjectCreate(BaseModel):
     description: str = ""
 
 
-projects = []
-
-
 @app.get("/")
 def root():
     return {
@@ -76,6 +73,7 @@ def get_project(project_id: str):
 
 @app.post("/projects")
 def create_project(project: ProjectCreate):
+
     return crud.create_project(
         project.name,
         project.description,
@@ -85,12 +83,10 @@ def create_project(project: ProjectCreate):
 @app.post("/projects/{project_id}/readme")
 def upload_readme(
     project_id: str,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
 ):
-    project = next(
-        (project for project in projects if project["id"] == project_id),
-        None,
-    )
+
+    project = crud.get_project(project_id)
 
     if not project:
         raise HTTPException(
@@ -103,7 +99,10 @@ def upload_readme(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    project["readme"] = str(file_path)
+    crud.upload_readme(
+        project_id,
+        file_path,
+    )
 
     return {
         "message": "README uploaded successfully",
@@ -114,57 +113,48 @@ def upload_readme(
 @app.get("/projects/{project_id}/readme")
 def get_readme(project_id: str):
 
-    project = next(
-        (p for p in projects if p["id"] == project_id),
-        None
-    )
+    readme_path = crud.get_readme(project_id)
 
-    if not project:
+    if not readme_path:
         raise HTTPException(
             status_code=404,
-            detail="Project not found"
-        )
-
-    if not project.get("readme"):
-        raise HTTPException(
-            status_code=404,
-            detail="README not uploaded"
+            detail="README not uploaded",
         )
 
     return FileResponse(
-        path=project["readme"],
+        path=readme_path,
         filename="README.md",
-        media_type="text/markdown"
+        media_type="text/markdown",
     )
 
 
 @app.post("/projects/{project_id}/screenshots")
 def upload_screenshot(
     project_id: str,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
 ):
 
-    project = next(
-        (p for p in projects if p["id"] == project_id),
-        None
-    )
+    project = crud.get_project(project_id)
 
     if not project:
         raise HTTPException(
             status_code=404,
-            detail="Project not found"
+            detail="Project not found",
         )
 
     extension = Path(file.filename).suffix
 
-    filename = f"{Path(file.filename).stem}{extension}"
+    filename = f"{project_id}_{len(project['screenshots']) + 1}{extension}"
 
     destination = SCREENSHOT_UPLOAD_DIR / filename
 
     with open(destination, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    project["screenshots"].append(filename)
+    crud.add_screenshot(
+        project_id,
+        filename,
+    )
 
     return {
         "message": "Screenshot uploaded successfully",
@@ -175,19 +165,16 @@ def upload_screenshot(
 @app.get("/projects/{project_id}/screenshots")
 def get_screenshots(project_id: str):
 
-    project = next(
-        (p for p in projects if p["id"] == project_id),
-        None
-    )
+    project = crud.get_project(project_id)
 
     if not project:
         raise HTTPException(
             status_code=404,
-            detail="Project not found"
+            detail="Project not found",
         )
 
     return {
-        "screenshots": project["screenshots"]
+        "screenshots": crud.get_screenshots(project_id)
     }
 
 
@@ -199,7 +186,7 @@ def get_screenshot(filename: str):
     if not image_path.exists():
         raise HTTPException(
             status_code=404,
-            detail="Screenshot not found"
+            detail="Screenshot not found",
         )
 
     return FileResponse(image_path)
@@ -208,32 +195,13 @@ def get_screenshot(filename: str):
 @app.delete("/projects/{project_id}")
 def delete_project(project_id: str):
 
-    project = next(
-        (p for p in projects if p["id"] == project_id),
-        None
-    )
+    success = crud.delete_project(project_id)
 
-    if not project:
+    if not success:
         raise HTTPException(
             status_code=404,
-            detail="Project not found"
+            detail="Project not found",
         )
-
-    if project.get("readme"):
-
-        readme_path = Path(project["readme"])
-
-        if readme_path.exists():
-            readme_path.unlink()
-
-    for screenshot in project["screenshots"]:
-
-        image_path = SCREENSHOT_UPLOAD_DIR / screenshot
-
-        if image_path.exists():
-            image_path.unlink()
-
-    projects.remove(project)
 
     return {
         "message": "Project deleted successfully"
