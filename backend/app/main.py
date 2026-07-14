@@ -4,10 +4,10 @@ import shutil
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from app.database import initialize_database
 import app.crud as crud
+from app.api.projects import router as project_router
 
 app = FastAPI(
     title="CraftOS API",
@@ -39,10 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class ProjectCreate(BaseModel):
-    name: str
-    description: str = ""
+app.include_router(project_router)
 
 
 @app.get("/")
@@ -50,34 +47,6 @@ def root():
     return {
         "message": "CraftOS API is running"
     }
-
-
-@app.get("/projects")
-def get_projects():
-    return crud.get_projects()
-
-
-@app.get("/projects/{project_id}")
-def get_project(project_id: str):
-
-    project = crud.get_project(project_id)
-
-    if not project:
-        raise HTTPException(
-            status_code=404,
-            detail="Project not found",
-        )
-
-    return project
-
-
-@app.post("/projects")
-def create_project(project: ProjectCreate):
-
-    return crud.create_project(
-        project.name,
-        project.description,
-    )
 
 
 @app.post("/projects/{project_id}/readme")
@@ -190,19 +159,3 @@ def get_screenshot(filename: str):
         )
 
     return FileResponse(image_path)
-
-
-@app.delete("/projects/{project_id}")
-def delete_project(project_id: str):
-
-    success = crud.delete_project(project_id)
-
-    if not success:
-        raise HTTPException(
-            status_code=404,
-            detail="Project not found",
-        )
-
-    return {
-        "message": "Project deleted successfully"
-    }
