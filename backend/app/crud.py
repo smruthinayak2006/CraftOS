@@ -325,3 +325,70 @@ def delete_project(project_id: str):
     connection.close()
 
     return True
+
+def upload_readme(project_id: str, readme_path: str):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        UPDATE projects
+        SET readme_path = ?
+        WHERE id = ?
+        """,
+        (
+            str(readme_path),
+            project_id,
+        ),
+    )
+
+    connection.commit()
+    connection.close()
+
+
+def get_readme(project_id: str):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT readme_path
+        FROM projects
+        WHERE id = ?
+        """,
+        (project_id,),
+    )
+
+    row = cursor.fetchone()
+
+    connection.close()
+
+    if not row:
+        return None
+
+    return row["readme_path"]
+
+
+def add_screenshot(
+    project_id: str,
+    filename: str,
+):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO screenshots (
+            project_id,
+            filename
+        )
+        VALUES (?, ?)
+        """,
+        (
+            project_id,
+            filename,
+        ),
+    )
+
+    connection.commit()
+    connection.close()

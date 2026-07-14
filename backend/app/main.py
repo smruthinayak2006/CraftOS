@@ -1,14 +1,11 @@
-from pathlib import Path
-
-from fastapi import FastAPI, HTTPException, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import initialize_database
-import app.crud as crud
 
-from app.api.projects import router as project_router
-from app.api.readmes import router as readme_router
+from app.api.projects import router as projects_router
+from app.api.readmes import router as readmes_router
+from app.api.screenshots import router as screenshots_router
 
 app = FastAPI(
     title="CraftOS API",
@@ -16,12 +13,6 @@ app = FastAPI(
 )
 
 initialize_database()
-
-SCREENSHOT_UPLOAD_DIR = Path("uploads/screenshots")
-SCREENSHOT_UPLOAD_DIR.mkdir(
-    parents=True,
-    exist_ok=True,
-)
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,9 +25,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(project_router)
-app.include_router(readme_router)
-
 
 @app.get("/")
 def root():
@@ -45,66 +33,6 @@ def root():
     }
 
 
-@app.post("/projects/{project_id}/screenshots")
-def upload_screenshot(
-    project_id: str,
-    file: UploadFile = File(...),
-):
-
-    project = crud.get_project(project_id)
-
-    if not project:
-        raise HTTPException(
-            status_code=404,
-            detail="Project not found",
-        )
-
-    extension = Path(file.filename).suffix
-
-    filename = f"{project_id}_{len(project['screenshots']) + 1}{extension}"
-
-    destination = SCREENSHOT_UPLOAD_DIR / filename
-
-    with open(destination, "wb") as buffer:
-        import shutil
-        shutil.copyfileobj(file.file, buffer)
-
-    crud.add_screenshot(
-        project_id,
-        filename,
-    )
-
-    return {
-        "message": "Screenshot uploaded successfully",
-        "filename": filename,
-    }
-
-
-@app.get("/projects/{project_id}/screenshots")
-def get_screenshots(project_id: str):
-
-    project = crud.get_project(project_id)
-
-    if not project:
-        raise HTTPException(
-            status_code=404,
-            detail="Project not found",
-        )
-
-    return {
-        "screenshots": crud.get_screenshots(project_id)
-    }
-
-
-@app.get("/screenshots/{filename}")
-def get_screenshot(filename: str):
-
-    image_path = SCREENSHOT_UPLOAD_DIR / filename
-
-    if not image_path.exists():
-        raise HTTPException(
-            status_code=404,
-            detail="Screenshot not found",
-        )
-
-    return FileResponse(image_path)
+app.include_router(projects_router)
+app.include_router(readmes_router)
+app.include_router(screenshots_router)
