@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import {
   getScreenshotUrl,
+  getReadmeUrl,
   deleteProject,
 } from "@/app/lib/api";
 
@@ -84,11 +85,28 @@ export default function ProjectDetails({
               README
             </h2>
 
-            <p className="mt-4 text-zinc-500">
-              {project.readme
-                ? "README uploaded"
-                : "Not uploaded"}
-            </p>
+            {!project.readme ? (
+              <p className="mt-4 text-zinc-500">
+                Not uploaded
+              </p>
+            ) : (
+              <div className="mt-5 space-y-4">
+
+                <p className="text-zinc-300">
+                  📄 README uploaded
+                </p>
+
+                <a
+                  href={getReadmeUrl(project.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                  Download README
+                </a>
+
+              </div>
+            )}
           </div>
 
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
