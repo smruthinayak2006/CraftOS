@@ -4,11 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import ReadmeViewer from "./ReadmeViewer";
 
 import {
   getScreenshotUrl,
-  getReadmeUrl,
-  uploadReadme,
   uploadScreenshot,
   deleteProject,
 } from "@/app/lib/api";
@@ -30,14 +29,8 @@ export default function ProjectDetails({
 }: Props) {
   const router = useRouter();
 
-  const readmeInputRef =
-    useRef<HTMLInputElement>(null);
-
   const screenshotInputRef =
     useRef<HTMLInputElement>(null);
-
-  const [uploadingReadme, setUploadingReadme] =
-    useState(false);
 
   const [
     uploadingScreenshot,
@@ -62,35 +55,6 @@ export default function ProjectDetails({
       router.refresh();
     } catch {
       alert("Failed to delete project.");
-    }
-  }
-
-  async function handleReadmeUpload(
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    try {
-      setUploadingReadme(true);
-
-      await uploadReadme(
-        project.id,
-        file
-      );
-
-      router.refresh();
-
-      alert("README uploaded successfully.");
-    } catch {
-      alert("Failed to upload README.");
-    } finally {
-      setUploadingReadme(false);
-
-      event.target.value = "";
     }
   }
 
@@ -155,65 +119,10 @@ export default function ProjectDetails({
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
 
-                    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-
-            <div className="flex items-center justify-between">
-
-              <h2 className="text-2xl font-semibold">
-                README
-              </h2>
-
-              <button
-                onClick={() => readmeInputRef.current?.click()}
-                disabled={uploadingReadme}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium transition hover:bg-emerald-700 disabled:opacity-60"
-              >
-                {uploadingReadme
-                  ? "Uploading..."
-                  : project.readme
-                    ? "Replace"
-                    : "Upload"}
-              </button>
-
-            </div>
-
-            {!project.readme ? (
-
-              <p className="mt-6 text-zinc-500">
-                No README uploaded.
-              </p>
-
-            ) : (
-
-              <div className="mt-6 space-y-4">
-
-                <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-                  <p className="font-medium">
-                    📄 README.md
-                  </p>
-
-                  <p className="mt-2 text-sm text-zinc-500">
-                    Stored successfully.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() =>
-                    window.open(
-                      getReadmeUrl(project.id),
-                      "_blank"
-                    )
-                  }
-                  className="inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium transition hover:bg-blue-700"
-                >
-                  View README
-                </button>
-
-              </div>
-
-            )}
-
-          </div>
+          <ReadmeViewer
+            projectId={project.id}
+            hasReadme={!!project.readme}
+          />
 
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
 
@@ -310,14 +219,6 @@ export default function ProjectDetails({
           </div>
 
         </div>
-
-        <input
-          ref={readmeInputRef}
-          type="file"
-          accept=".md,.txt"
-          className="hidden"
-          onChange={handleReadmeUpload}
-        />
 
         <input
           ref={screenshotInputRef}

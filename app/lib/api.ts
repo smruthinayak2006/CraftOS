@@ -100,6 +100,20 @@ export async function uploadScreenshot(
   return response.json();
 }
 
+export async function getReadmeContent(
+  projectId: string
+) {
+  const response = await fetch(
+    `${API_URL}/projects/${projectId}/readme/content`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load README");
+  }
+
+  return response.json();
+}
+
 export function getReadmeUrl(projectId: string) {
   return `${API_URL}/projects/${projectId}/readme`;
 }
