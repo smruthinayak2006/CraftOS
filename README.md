@@ -8,14 +8,16 @@ CraftOS helps organize software projects by storing project details, README file
 
 # Features
 
-- Create projects
-- View all projects
-- View individual project workspace
-- Upload README files
-- Download README files
-- REST API with FastAPI
-- Next.js frontend
-- Interactive Swagger documentation
+- Create, view and delete projects
+- Persistent SQLite project storage
+- Dedicated project workspace
+- Upload and replace README files
+- Embedded README viewer
+- Upload multiple project screenshots
+- Screenshot gallery with preview
+- REST API built with FastAPI
+- Interactive Swagger/OpenAPI documentation
+- Next.js + React frontend
 
 ---
 
@@ -32,7 +34,14 @@ CraftOS helps organize software projects by storing project details, README file
 
 - FastAPI
 - Python
+- SQLite
 - Uvicorn
+
+---
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
 
 ---
 
@@ -43,15 +52,21 @@ CraftOS
 │
 ├── app/
 │   ├── lib/
-│   └── project/
+│   ├── project/
+│   └── layout.tsx
 │
 ├── backend/
 │   ├── app/
+│   │   ├── api/
+│   │   ├── crud.py
+│   │   ├── database.py
 │   │   └── main.py
 │   │
-│   └── uploads/
-│       ├── readmes/
-│       └── screenshots/
+│   ├── uploads/
+│   │   ├── readmes/
+│   │   └── screenshots/
+│   │
+│   └── craftos.db
 │
 ├── components/
 │
@@ -72,7 +87,12 @@ CraftOS
 | POST | /projects | Create project |
 | GET | /projects/{project_id} | Get project |
 | POST | /projects/{project_id}/readme | Upload README |
-| GET | /projects/{project_id}/readme | Download README |
+| GET | /projects/{project_id}/readme | Get README file |
+| GET | /projects/{project_id}/readme/content | Get README content |
+| POST | /projects/{project_id}/screenshots | Upload screenshot |
+| GET | /projects/{project_id}/screenshots | List screenshots |
+| GET | /screenshots/{filename} | View screenshot |
+| DELETE | /projects/{project_id} | Delete project |
 
 ---
 
@@ -114,15 +134,21 @@ CraftOS
 
 ---
 
-## Download README
+## README Viewer
 
-![Download README](docs/screenshots/readme-download-success.png)
+![README Viewer](docs/screenshots/readme-viewer-dashboard.png)
 
 ---
 
-## README Storage
+## README Content API
 
-![README Storage](docs/screenshots/readme-storage-backend.png)
+![README Content API](docs/screenshots/readme-content-api-success.png)
+
+---
+
+## Screenshot Gallery
+
+![Screenshot Gallery](docs\screenshots\project-workspace.png)
 
 ---
 
@@ -170,7 +196,7 @@ http://localhost:3000
 
 - ✅ Project Management
 - ✅ README Management
-- ⏳ Screenshot Management
+- ✅ Screenshot Management
 - ⏳ Notes
 - ⏳ AI Content Generation
 - ⏳ Project Export
