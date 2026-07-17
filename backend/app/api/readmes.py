@@ -60,6 +60,33 @@ def get_readme(project_id: str):
 
     return FileResponse(
         path=readme_path,
-        filename="README.md",
         media_type="text/markdown",
     )
+
+
+@router.get("/projects/{project_id}/readme/content")
+def get_readme_content(project_id: str):
+
+    readme_path = crud.get_readme(project_id)
+
+    if not readme_path:
+        raise HTTPException(
+            status_code=404,
+            detail="README not uploaded",
+        )
+
+    path = Path(readme_path)
+
+    if not path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="README file not found",
+        )
+
+    content = path.read_text(
+        encoding="utf-8"
+    )
+
+    return {
+        "content": content,
+    }
