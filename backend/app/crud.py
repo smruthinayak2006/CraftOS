@@ -326,35 +326,17 @@ def delete_project(project_id: str):
 
     return True
 
-def upload_readme(project_id: str, readme_path: str):
+def get_note(project_id: str):
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute(
         """
-        UPDATE projects
-        SET readme_path = ?
-        WHERE id = ?
-        """,
-        (
-            str(readme_path),
-            project_id,
-        ),
-    )
-
-    connection.commit()
-    connection.close()
-
-
-def get_readme(project_id: str):
-    connection = get_connection()
-    cursor = connection.cursor()
-
-    cursor.execute(
-        """
-        SELECT readme_path
-        FROM projects
-        WHERE id = ?
+        SELECT content
+        FROM notes
+        WHERE project_id = ?
+        ORDER BY id DESC
+        LIMIT 1
         """,
         (project_id,),
     )
@@ -366,29 +348,97 @@ def get_readme(project_id: str):
     if not row:
         return None
 
-    return row["readme_path"]
+    return row["content"]
 
 
-def add_screenshot(
-    project_id: str,
-    filename: str,
-):
+def save_note(project_id: str, content: str):
     connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute(
         """
-        INSERT INTO screenshots (
-            project_id,
-            filename
-        )
-        VALUES (?, ?)
+        SELECT id
+        FROM notes
+        WHERE project_id = ?
         """,
-        (
-            project_id,
-            filename,
-        ),
+        (project_id,),
+    )
+
+    existing = cursor.fetchone()
+
+    if existing:
+
+        cursor.execute(
+            """
+            UPDATE notes
+            SET
+                content = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE project_id = ?
+            """,
+            (
+                content,
+                project_id,
+            ),
+        )
+
+    else:
+
+        cursor.execute(
+            """
+            INSERT INTO notes
+            (
+                project_id,
+                content
+            )
+            VALUES (?, ?)
+            """,
+            (
+                project_id,
+                content,
+            ),
+        )
+
+    connection.commit()
+    connection.close()
+
+    return True
+
+
+def delete_note(project_id: str):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM notes
+        WHERE project_id = ?
+        """,
+        (project_id,),
     )
 
     connection.commit()
     connection.close()
+
+    return True
+
+
+def has_note(project_id: str):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM notes
+        WHERE project_id = ?
+        LIMIT 1
+        """,
+        (project_id,),
+    )
+
+    exists = cursor.fetchone() is not None
+
+    connection.close()
+
+    return exists
