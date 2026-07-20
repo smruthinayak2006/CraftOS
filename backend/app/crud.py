@@ -442,3 +442,25 @@ def has_note(project_id: str):
     connection.close()
 
     return exists
+
+def delete_screenshot(filename: str):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM screenshots
+        WHERE filename = ?
+        """,
+        (filename,),
+    )
+
+    connection.commit()
+    connection.close()
+
+    image = Path("uploads/screenshots") / filename
+
+    if image.exists():
+        image.unlink()
+
+    return True

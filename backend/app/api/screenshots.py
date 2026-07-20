@@ -80,3 +80,12 @@ def get_screenshot(filename: str):
         )
 
     return FileResponse(image_path)
+
+@router.delete("/screenshots/{filename}")
+def delete_screenshot(filename: str):
+
+    crud.delete_screenshot(filename)
+
+    return {
+        "message": "Screenshot deleted successfully"
+    }
