@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import ReadmeViewer from "./ReadmeViewer";
+import NotesCard from "./NotesCard";
 
 import {
   getScreenshotUrl,
@@ -182,17 +183,9 @@ export default function ProjectDetails({
 
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-
-            <h2 className="text-2xl font-semibold">
-              Notes
-            </h2>
-
-            <p className="mt-5 text-zinc-500">
-              Coming in the next update.
-            </p>
-
-          </div>
+          <NotesCard
+            projectId={project.id}
+          />
 
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
 

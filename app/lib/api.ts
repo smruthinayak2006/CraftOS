@@ -121,3 +121,56 @@ export function getReadmeUrl(projectId: string) {
 export function getScreenshotUrl(filename: string) {
   return `${API_URL}/screenshots/${filename}`;
 }
+
+export async function getNote(projectId: string) {
+  const response = await fetch(
+    `${API_URL}/projects/${projectId}/notes`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch note");
+  }
+
+  return response.json();
+}
+
+export async function saveNote(
+  projectId: string,
+  content: string
+) {
+  const response = await fetch(
+    `${API_URL}/projects/${projectId}/notes`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to save note");
+  }
+
+  return response.json();
+}
+
+export async function deleteNote(
+  projectId: string
+) {
+  const response = await fetch(
+    `${API_URL}/projects/${projectId}/notes`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete note");
+  }
+
+  return response.json();
+}
