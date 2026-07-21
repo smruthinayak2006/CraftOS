@@ -9,9 +9,9 @@ router = APIRouter(
 )
 
 
-class ProjectCreate(BaseModel):
+class ProjectRequest(BaseModel):
     name: str
-    description: str = ""
+    description: str
 
 
 @router.get("")
@@ -32,9 +32,30 @@ def get_project(project_id: str):
 
     return project
 
+@router.put("/{project_id}")
+def update_project(
+    project_id: str,
+    project: ProjectRequest,
+):
+
+    existing = crud.get_project(project_id)
+
+    if not existing:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found",
+        )
+
+    crud.update_project(
+        project_id,
+        project.name,
+        project.description,
+    )
+
+    return crud.get_project(project_id)
 
 @router.post("")
-def create_project(project: ProjectCreate):
+def create_project(project: ProjectRequest):
 
     return crud.create_project(
         project.name,

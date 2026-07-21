@@ -464,3 +464,31 @@ def delete_screenshot(filename: str):
         image.unlink()
 
     return True
+
+def update_project(
+    project_id: str,
+    name: str,
+    description: str,
+):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        UPDATE projects
+        SET
+            name = ?,
+            description = ?
+        WHERE id = ?
+        """,
+        (
+            name,
+            description,
+            project_id,
+        ),
+    )
+
+    connection.commit()
+    connection.close()
+
+    return True
