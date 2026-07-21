@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import ReadmeViewer from "./ReadmeViewer";
+import EditProjectModal from "./EditProjectModal";
 import NotesCard from "./NotesCard";
 
 import {
@@ -12,6 +13,7 @@ import {
   uploadScreenshot,
   deleteScreenshot,
   deleteProject,
+  updateProject,
 } from "@/app/lib/api";
 
 type Project = {
@@ -30,6 +32,9 @@ export default function ProjectDetails({
   project,
 }: Props) {
   const router = useRouter();
+
+  const [isEditOpen, setIsEditOpen] =
+    useState(false);
 
   const screenshotInputRef =
     useRef<HTMLInputElement>(null);
@@ -57,6 +62,25 @@ export default function ProjectDetails({
       router.refresh();
     } catch {
       alert("Failed to delete project.");
+    }
+  }
+
+  async function handleEditProject(
+    name: string,
+    description: string
+  ) {
+    try {
+      await updateProject(
+        project.id,
+        name,
+        description
+      );
+
+      router.refresh();
+
+      alert("Project updated successfully.");
+    } catch {
+      alert("Failed to update project.");
     }
   }
 
@@ -122,12 +146,23 @@ export default function ProjectDetails({
             ← Back
           </Link>
 
-          <button
-            onClick={handleDelete}
-            className="rounded-xl bg-red-600 px-5 py-3 font-semibold transition hover:bg-red-700"
-          >
-            Delete Project
-          </button>
+          <div className="flex gap-3">
+
+            <button
+              onClick={() => setIsEditOpen(true)}
+              className="rounded-xl bg-blue-600 px-5 py-3 font-semibold transition hover:bg-blue-700"
+            >
+              Edit Project
+            </button>
+
+            <button
+              onClick={handleDelete}
+              className="rounded-xl bg-red-600 px-5 py-3 font-semibold transition hover:bg-red-700"
+            >
+              Delete Project
+            </button>
+
+          </div>
 
         </div>
 
@@ -259,6 +294,15 @@ export default function ProjectDetails({
         />
 
       </div>
+
+      <EditProjectModal
+        isOpen={isEditOpen}
+        initialName={project.name}
+        initialDescription={project.description}
+        onClose={() => setIsEditOpen(false)}
+        onSave={handleEditProject}
+      />      
+
     </main>
   );
 }
