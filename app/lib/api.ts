@@ -174,3 +174,20 @@ export async function deleteNote(
 
   return response.json();
 }
+
+export async function deleteScreenshot(
+  filename: string
+) {
+  const response = await fetch(
+    `${API_URL}/screenshots/${filename}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete screenshot");
+  }
+
+  return response.json();
+}

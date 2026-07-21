@@ -10,6 +10,7 @@ import NotesCard from "./NotesCard";
 import {
   getScreenshotUrl,
   uploadScreenshot,
+  deleteScreenshot,
   deleteProject,
 } from "@/app/lib/api";
 
@@ -87,7 +88,27 @@ export default function ProjectDetails({
       event.target.value = "";
     }
   }
+  async function handleDeleteScreenshot(
+    filename: string
+  ) {
+    const confirmed = window.confirm(
+      "Delete this screenshot?"
+    );
 
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteScreenshot(filename);
+
+      router.refresh();
+
+      alert("Screenshot deleted successfully.");
+    } catch {
+      alert("Failed to delete screenshot.");
+    }
+  }
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       <div className="mx-auto max-w-7xl px-8 py-12">
@@ -158,23 +179,39 @@ export default function ProjectDetails({
               <div className="mt-6 grid grid-cols-2 gap-4">
 
                 {project.screenshots.map((filename) => (
-                  <a
+                  <div
                     key={filename}
-                    href={getScreenshotUrl(filename)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition hover:border-blue-500"
+                    className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition hover:border-blue-500"
                   >
-                    <div className="relative aspect-video w-full overflow-hidden">
-                      <Image
-                        src={getScreenshotUrl(filename)}
-                        alt="Project Screenshot"
-                        fill
-                        unoptimized
-                        className="object-cover transition duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  </a>
+
+                    <button
+                      onClick={() =>
+                        handleDeleteScreenshot(filename)
+                      }
+                      className="absolute right-2 top-2 z-10 rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100 hover:bg-red-700"
+                    >
+                      🗑
+                    </button>
+
+                    <a
+                      href={getScreenshotUrl(filename)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div className="relative aspect-video w-full overflow-hidden">
+
+                        <Image
+                          src={getScreenshotUrl(filename)}
+                          alt="Project Screenshot"
+                          fill
+                          unoptimized
+                          className="object-cover transition duration-300 group-hover:scale-105"
+                        />
+
+                      </div>
+                    </a>
+
+                  </div>
                 ))}
 
               </div>
