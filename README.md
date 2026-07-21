@@ -152,6 +152,12 @@ CraftOS
 
 ---
 
+## Delete Screenshot
+
+![Delete Screenshot](docs/screenshots/screenshot-delete-success.png)
+
+---
+
 # Running the Backend
 
 ```bash
