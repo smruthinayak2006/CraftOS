@@ -1,36 +1,76 @@
 # CraftOS
 
-AI-powered Content Operating System for developers, students, and creators.
+An AI-powered Content Operating System for developers, students, and creators.
 
-CraftOS helps organize software projects by storing project details, README files, screenshots, notes, and AI-generated content in one workspace.
+CraftOS is a centralized workspace for managing software projects. It combines project organization, documentation, screenshots, notes, and AI-assisted content generation into a single application, eliminating the need to manage project assets across multiple tools.
 
 ---
 
-# Features
+## Overview
 
-- Create, view and delete projects
-- Persistent SQLite project storage
-- Dedicated project workspace
-- Upload and replace README files
-- Embedded README viewer
-- Upload multiple project screenshots
-- Screenshot gallery with preview
-- REST API built with FastAPI
-- Interactive Swagger/OpenAPI documentation
+Managing software projects often means switching between README files, screenshots, personal notes, documentation, and content drafts spread across different folders and applications.
+
+CraftOS brings everything together in one workspace by allowing you to:
+
+- Organize projects
+- Manage documentation
+- Store screenshots
+- Write project notes
+- Generate content (planned)
+- Access everything through a clean web interface backed by a REST API
+
+---
+
+## Features
+
+### Project Management
+
+- Create projects
+- View all projects
+- Edit project details
+- Delete projects
+- Persistent SQLite storage
+
+### README Management
+
+- Upload README files
+- Replace existing README
+- Embedded README preview
+- Retrieve raw Markdown through the API
+
+### Screenshot Management
+
+- Upload multiple screenshots
+- Visual screenshot gallery
+- Full-size preview
+- Delete screenshots
+
+### Notes
+
+- Save project-specific notes
+- Edit notes
+- Clear notes
+
+### Developer Experience
+
+- FastAPI REST API
+- Interactive Swagger documentation
 - Next.js + React frontend
+- SQLite database
+- Modular backend architecture
 
 ---
 
-# Tech Stack
+## Tech Stack
 
-## Frontend
+### Frontend
 
 - Next.js
 - React
 - TypeScript
 - Tailwind CSS
 
-## Backend
+### Backend
 
 - FastAPI
 - Python
@@ -39,15 +79,86 @@ CraftOS helps organize software projects by storing project details, README file
 
 ---
 
-## Documentation
+## Architecture
 
-- [Architecture](docs/ARCHITECTURE.md)
+Detailed project architecture is available here:
+
+**docs/ARCHITECTURE.md**
 
 ---
 
-# Project Structure
+# Screenshots
 
-```
+## Dashboard
+
+![Dashboard](docs/screenshots/frontend-dashboard.png)
+
+---
+
+## Project Workspace
+
+![Workspace](docs/screenshots/project-workspace.png)
+
+---
+
+## README Viewer
+
+![README Viewer](docs/screenshots/readme-viewer-dashboard.png)
+
+---
+
+## API Documentation (Swagger)
+
+![Create Project](docs/screenshots/create-project-api-success.png)
+
+![Get Projects](docs/screenshots/get-projects-api-success.png)
+
+![Get Project](docs/screenshots/get-project-by-id-success.png)
+
+![Update Project](docs/screenshots/update-project-api-success.png)
+
+---
+
+## README API
+
+![Upload README](docs/screenshots/readme-upload-success.png)
+
+![README Content](docs/screenshots/readme-content-api-success.png)
+
+---
+
+## Screenshot Management
+
+![Delete Screenshot](docs/screenshots/screenshot-delete-success.png)
+
+---
+
+## REST API
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/` | API Status |
+| GET | `/projects` | List projects |
+| POST | `/projects` | Create project |
+| GET | `/projects/{project_id}` | Get project |
+| PUT | `/projects/{project_id}` | Update project |
+| DELETE | `/projects/{project_id}` | Delete project |
+| POST | `/projects/{project_id}/readme` | Upload README |
+| GET | `/projects/{project_id}/readme` | Download README |
+| GET | `/projects/{project_id}/readme/content` | Get README content |
+| POST | `/projects/{project_id}/screenshots` | Upload screenshot |
+| GET | `/projects/{project_id}/screenshots` | List screenshots |
+| DELETE | `/screenshots/{filename}` | Delete screenshot |
+| GET | `/screenshots/{filename}` | View screenshot |
+| GET | `/projects/{project_id}/notes` | Get notes |
+| POST | `/projects/{project_id}/notes` | Save notes |
+| DELETE | `/projects/{project_id}/notes` | Delete notes |
+
+---
+
+## Project Structure
+
+```text
 CraftOS
 │
 ├── app/
@@ -69,96 +180,15 @@ CraftOS
 │   └── craftos.db
 │
 ├── components/
-│
 ├── docs/
-│   └── screenshots/
-│
 └── README.md
 ```
 
 ---
 
-# API Endpoints
+## Getting Started
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | / | API Status |
-| GET | /projects | Get all projects |
-| POST | /projects | Create project |
-| GET | /projects/{project_id} | Get project |
-| POST | /projects/{project_id}/readme | Upload README |
-| GET | /projects/{project_id}/readme | Get README file |
-| GET | /projects/{project_id}/readme/content | Get README content |
-| POST | /projects/{project_id}/screenshots | Upload screenshot |
-| GET | /projects/{project_id}/screenshots | List screenshots |
-| GET | /screenshots/{filename} | View screenshot |
-| DELETE | /projects/{project_id} | Delete project |
-
----
-
-# Current Features
-
-## Dashboard
-
-![Dashboard](docs/screenshots/frontend-dashboard.png)
-
----
-
-## Project Workspace
-
-![Workspace](docs/screenshots/project-workspace.png)
-
----
-
-## Create Project API
-
-![Create Project](docs/screenshots/create-project-api-success.png)
-
----
-
-## Get Projects API
-
-![Projects API](docs/screenshots/get-projects-api-success.png)
-
----
-
-## Get Project by ID
-
-![Project By ID](docs/screenshots/get-project-by-id-success.png)
-
----
-
-## Upload README
-
-![Upload README](docs/screenshots/readme-upload-success.png)
-
----
-
-## README Viewer
-
-![README Viewer](docs/screenshots/readme-viewer-dashboard.png)
-
----
-
-## README Content API
-
-![README Content API](docs/screenshots/readme-content-api-success.png)
-
----
-
-## Screenshot Gallery
-
-![Screenshot Gallery](docs\screenshots\project-workspace.png)
-
----
-
-## Delete Screenshot
-
-![Delete Screenshot](docs/screenshots/screenshot-delete-success.png)
-
----
-
-# Running the Backend
+### Backend
 
 ```bash
 cd backend
@@ -168,13 +198,13 @@ cd backend
 uvicorn app.main:app --reload
 ```
 
-Backend:
+Backend
 
 ```
 http://127.0.0.1:8000
 ```
 
-Swagger:
+Swagger
 
 ```
 http://127.0.0.1:8000/docs
@@ -182,7 +212,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-# Running the Frontend
+### Frontend
 
 ```bash
 npm install
@@ -190,7 +220,7 @@ npm install
 npm run dev
 ```
 
-Frontend:
+Frontend
 
 ```
 http://localhost:3000
@@ -198,17 +228,27 @@ http://localhost:3000
 
 ---
 
-# Roadmap
+## Roadmap
+
+### Completed
 
 - ✅ Project Management
 - ✅ README Management
 - ✅ Screenshot Management
-- ⏳ Notes
-- ⏳ AI Content Generation
-- ⏳ Project Export
+- ✅ Notes
+
+### Planned
+
+- AI README Generation
+- LinkedIn Post Generation
+- Release Notes Generation
+- Project Export
+- GitHub Integration
+- Authentication
+- Cloud Storage
 
 ---
 
-# Author
+## Author
 
-Smruthi Nayak
+**Smruthi Nayak**
