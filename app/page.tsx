@@ -1,101 +1,249 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import CreateProjectModal from "@/components/CreateProjectModal";
-import { getProjects, createProject } from "@/app/lib/api";
+import DashboardHero from "@/components/DashboardHero";
+import DashboardStats from "@/components/DashboardStats";
+import ProjectCard from "@/components/ProjectCard";
+import SearchBar from "@/components/SearchBar";
+
+import {
+  getProjects,
+  createProject,
+} from "@/app/lib/api";
 
 type Project = {
   id: string;
   name: string;
   description: string;
+  readme: string | null;
+  screenshots: string[];
 };
 
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
+
+  const [projects, setProjects] =
+    useState<Project[]>([]);
+
+  const [search, setSearch] =
+    useState("");
 
   useEffect(() => {
+
     async function loadProjects() {
-      const data = await getProjects();
-      setProjects(data);
+
+      try {
+
+        const data =
+          await getProjects();
+
+        setProjects(data);
+
+      } catch {
+
+        alert(
+          "Failed to load projects."
+        );
+
+      }
+
     }
 
     loadProjects();
+
   }, []);
 
   async function handleCreateProject(
     name: string,
     description: string
   ) {
-    const newProject = await createProject(name, description);
 
-    setProjects((previous) => [newProject, ...previous]);
+    try {
+
+      const newProject =
+        await createProject(
+          name,
+          description
+        );
+
+      setProjects((previous) => [
+        newProject,
+        ...previous,
+      ]);
+
+    } catch {
+
+      alert(
+        "Failed to create project."
+      );
+
+    }
+
   }
 
-  return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="mx-auto max-w-7xl px-8 py-12">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">CraftOS</h1>
+  const filteredProjects =
+    useMemo(() => {
 
-            <p className="mt-2 text-zinc-400">
-              What are you building today?
-            </p>
+      return projects.filter(
+        (project) => {
+
+          const query =
+            search.toLowerCase();
+
+          return (
+            project.name
+              .toLowerCase()
+              .includes(query) ||
+
+            project.description
+              .toLowerCase()
+              .includes(query)
+          );
+
+        }
+      );
+
+    }, [
+      projects,
+      search,
+    ]);
+
+  return (
+
+    <main className="min-h-screen bg-zinc-950 text-white">
+
+      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+
+        <DashboardHero
+          onCreateProject={() =>
+            setIsModalOpen(true)
+          }
+        />
+
+        <DashboardStats
+          projects={projects}
+        />
+
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+        />
+
+        <section className="mt-12">
+
+          <div className="mb-8 flex items-center justify-between">
+
+            <div>
+
+              <h2 className="text-3xl font-bold">
+                Projects
+              </h2>
+
+              <p className="mt-2 text-zinc-500">
+
+                {filteredProjects.length}
+
+                {" "}project
+
+                {filteredProjects.length !== 1
+                  ? "s"
+                  : ""}
+
+                {" "}available
+
+              </p>
+
+            </div>
+
+            <div className="rounded-full border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm text-zinc-400">
+
+              Developer Workspace
+
+            </div>
+
           </div>
 
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="rounded-xl bg-white px-5 py-3 font-medium text-black transition hover:bg-zinc-200"
-          >
-            + Create Project
-          </button>
-        </header>
+                    {filteredProjects.length === 0 ? (
 
-        <section className="mt-16">
-          <h2 className="text-2xl font-semibold">
-            Recent Projects
-          </h2>
+            <div className="rounded-3xl border border-dashed border-zinc-800 bg-zinc-900/30 px-8 py-20 text-center">
 
-          {projects.length === 0 ? (
-            <div className="mt-6 rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/20 p-16 text-center">
-              <h3 className="text-xl font-semibold">
-                No projects yet
-              </h3>
+              <div className="mx-auto max-w-xl">
 
-              <p className="mt-3 text-zinc-500">
-                Start by creating your first project.
-              </p>
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-zinc-900 text-4xl">
+                  📂
+                </div>
+
+                <h3 className="mt-8 text-3xl font-bold">
+                  {search
+                    ? "No matching projects"
+                    : "No projects yet"}
+                </h3>
+
+                <p className="mt-4 leading-7 text-zinc-500">
+
+                  {search
+                    ? "Try a different search term."
+                    : "Create your first project to start organizing documentation, screenshots and notes."}
+
+                </p>
+
+                {!search && (
+
+                  <button
+                    onClick={() =>
+                      setIsModalOpen(true)
+                    }
+                    className="mt-8 rounded-xl bg-blue-600 px-6 py-3 font-semibold transition hover:bg-blue-700"
+                  >
+                    Create First Project
+                  </button>
+
+                )}
+
+              </div>
+
             </div>
+
           ) : (
-            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {projects.map((project) => (
-                <Link
-                  key={project.id}
-                  href={`/project/${project.id}`}
-                >
-                  <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 transition hover:border-white hover:scale-[1.02] cursor-pointer">
-                    <h3 className="text-xl font-semibold">
-                      {project.name}
-                    </h3>
 
-                    <p className="mt-2 text-sm text-zinc-400">
-                      {project.description || "No description"}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+              {filteredProjects.map(
+                (project) => (
+
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                  />
+
+                )
+              )}
+
             </div>
+
           )}
+
         </section>
+
       </div>
 
       <CreateProjectModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreate={handleCreateProject}
+        onClose={() =>
+          setIsModalOpen(false)
+        }
+        onCreate={
+          handleCreateProject
+        }
       />
+
     </main>
+
   );
+
 }
